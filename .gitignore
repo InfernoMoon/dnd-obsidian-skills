@@ -1,0 +1,36 @@
+# Personal Skills
+skills/my-personal-skill
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.vscode/
+.idea/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*~
+
+# Agent runtime / local state
+.agents/.cache/
+.agents/cache/
+.agents/tmp/
+.agents/logs/
+.agents/state/
+.agents/sessions/
+
+# Local agent configuration
+.agents/local/
+.agents/.local/
