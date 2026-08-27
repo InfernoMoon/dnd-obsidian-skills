@@ -54,6 +54,7 @@ Use this skill when creating, reorganizing, or editing notes in an Obsidian vaul
 - Do not invent facts when editing knowledge notes; mark uncertainty or proposals clearly.
 - Preserve existing Dataview, ccard, statblock, Excalidraw, and other specialized blocks.
 - Do not replace structured or visual data with ordinary Markdown.
+- A file should never start of end with a ```-block. Add a empty line to prevent this
 
 ## Editing Workflow
 
