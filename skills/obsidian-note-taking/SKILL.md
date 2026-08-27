@@ -54,7 +54,7 @@ Use this skill when creating, reorganizing, or editing notes in an Obsidian vaul
 - Do not invent facts when editing knowledge notes; mark uncertainty or proposals clearly.
 - Preserve existing Dataview, ccard, statblock, Excalidraw, and other specialized blocks.
 - Do not replace structured or visual data with ordinary Markdown.
-- - A Markdown file must not begin or end directly with a fenced code block. Leave at least one blank line before the opening fence and after the closing fence, even when the file contains only one code block. When editing an empty file, explicitly add both the leading and trailing blank lines.
+- - A Markdown file must not begin or end directly with a fenced code block or callout. Leave at least one blank line before the opening fence or and after the closing fence, even when the file contains only one code block or callout. When editing an empty file, explicitly add both the leading and trailing blank lines.
 
 ## Editing Workflow
 
