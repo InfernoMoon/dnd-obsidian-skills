@@ -1,26 +1,48 @@
 ---
 name: callout-tracking
-description: Create, edit, and maintain Obsidian callouts and Callout Tracker overview blocks for organizing campaign ideas, notes, todos, hooks, rules, and clues without relying on tags or properties.
+description: Create, edit, query, and maintain Obsidian callouts and Callout Tracker overview blocks for organizing campaign ideas, notes, todos, hooks, rules, and clues without relying on tags or properties.
 ---
 
 # Callout Tracking
 
-Use this skill when creating, reviewing, organizing, or cleaning up tracked callouts in the campaign vault.
+Use this skill when creating, reviewing, organizing, querying, or cleaning up tracked callouts in the campaign vault.
+
+## Callout format
+
+A valid callout starts with `>` followed by optional whitespace and `[!callout-name]`.
+
+The header is optional:
+
+> [!idea] Possible betrayal
+
+A callout can contain multiple following lines. Every continuation line must start with `>` followed by optional whitespace:
+
+> [!idea] Possible betrayal
+> The merchant may be working for the enemy.
+> Look for evidence before confronting them.
+
+The callout ends at the first following line that does not start with `>`.
+
+Preserve existing links, Markdown formatting, and other callouts when editing.
 
 ## Use Callout Tracker
 
 To create a dedicated overview note, such as `Callout Tracker.md`, use:
 
 ```callout-tracker
-callouts: callountname, anothercallountname
-rootfolder: Myroot
+callouts: callout-name, another-callout-name
+rootfolder: MyRoot
 ```
 
 The plugin scans the selected folder and displays matching callouts grouped by type. Each result is clickable and opens the source note at the callout’s line.
 
 `rootfolder:` is optional. If omitted, the plugin uses its configured default root folder. An empty default root folder searches the entire vault.
 
-`callouts:` Enter one or more callout names here, separated by commas. The order determines how the results are grouped: callouts of the first type appear first, followed by the next types.
+`callouts:` accepts one or more callout names separated by commas or spaces. The order determines how results are grouped: callouts of the first type appear first, followed by the next types.
+
+Only add `rootfolder:` or `search:` when they are useful. Do not add empty or unnecessary settings.
+
+While editing a block, the plugin suggests `callouts:`, `rootfolder:`, and `search:`. After `callouts:`, it suggests callout names configured in the plugin settings. Suggestions also work after commas.
 
 ## Add a search section
 
@@ -32,7 +54,7 @@ rootfolder: Campaign
 search: tavern
 ```
 
-Only callouts containing `tavern` in their header or body are displayed. Searches are case-insensitive.
+For tracker blocks, the search is case-insensitive and checks the callout header and body.
 
 Remove the `search:` line or leave it empty to show all selected callouts.
 
@@ -48,9 +70,48 @@ callouts: idea, hook
 search: village
 ```
 
-While editing a block, the plugin suggests `callouts:`, `rootfolder:`, and `search:`. After `callouts:`, it suggests callout names configured in the plugin settings. Suggestions also work after commas.
+## Query the Callout Tracker API
 
-Only use search and rootfolder when it makes sense. If they are not needed no not add them.
+Use the Callout Tracker API when structured callout data is needed for reasoning, recommendations, or AI-assisted organization.
+
+Do not use UI automation, a Node.js REPL, source-code inspection, or manual file scanning when the API can provide the required results.
+
+The API is available after the Callout Tracker plugin is enabled and loaded in the target vault.
+
+The main method is:
+
+`api.search(options?)`
+
+Supported options:
+
+- `callouts`: An array or comma-separated string of callout types. Defaults to `idea`, `note`, and `todo`.
+- `rootFolder`: An optional folder path. Defaults to the plugin’s configured root folder.
+- `search`: Optional case-insensitive text searched in the file name, callout title, and callout body.
+
+Each result contains:
+
+- `fileName`
+- `filePath`
+- `line`
+- `type`
+- `title`
+- `body`
+
+When using the Obsidian CLI from Bash, locate the plugin by its API instead of using `app.plugins.plugins["callout-tracker"]`. Nested quotes can be stripped by the shell.
+
+To retrieve all default callouts:
+
+`obsidian vault="Vault Name" eval 'code=Object.values(app.plugins.plugins).find(p => p?.api?.search)?.api.search().then(results => JSON.stringify(results))'`
+
+To query specific types and text:
+
+`obsidian vault="Vault Name" eval "code=Object.values(app.plugins.plugins).find(p => p?.api?.search)?.api.search({callouts:['hook','clue'],search:'dragon',rootFolder:'Campaign'}).then(results => JSON.stringify(results))"`
+
+The API search is asynchronous. Always serialize the result with `.then(results => JSON.stringify(results))`.
+
+An empty array means that no matching callouts were found. An `undefined` result usually means that Callout Tracker is not enabled or loaded. Report actual CLI errors instead of guessing.
+
+The `test()` API method should only be used to diagnose whether the bridge is working.
 
 ## Callout meanings
 
@@ -61,8 +122,7 @@ Only use search and rootfolder when it makes sense. If they are not needed no no
 - `[!rule]` — a campaign rule, constraint, or agreed decision.
 - `[!clue]` — an unresolved clue, discovery, or piece of information to revisit.
 
-Use any custom callout type defined in Callout Tracker settings when it better describes the item.
-Additional callout may be mentioned and AGENTS.md
+Use any custom callout type defined in Callout Tracker settings when it better describes the item. Check `AGENTS.md` or other vault instructions for additional project-specific callout types.
 
 ## Rules
 
@@ -72,7 +132,9 @@ Additional callout may be mentioned and AGENTS.md
 - For `[!hook]`, record the story opportunity and its relevant context.
 - For `[!rule]`, write the rule or decision clearly enough to apply later.
 - For `[!clue]`, preserve what is known and identify what remains unresolved.
+- Use custom callout types when they improve organization.
 - Do not use tags or properties for this tracking system.
 - Do not duplicate the same tracked item across multiple notes unless the duplication is useful for context.
 - When a TODO is completed, remove it or rewrite it to reflect the remaining work.
-- Preserve existing links, formatting, and other callouts when editing a note.
+- Do not rewrite unrelated note content.
+- Preserve existing links, formatting, and other callouts when editing.
