@@ -3,13 +3,13 @@ AI agent skills for creating and managing DnD campaigns in Obsidian, including v
 
 ## Required Obsidian Plugins
 
-- [Claudian](obsidian://show-plugin?id=realclaudian)
+- [Claudian](obsidian://show-plugin?id=realclaudian) (realclaudian)
     - supports Codex, Claude, and other AI coding and agent tools directly in Obsidian.
-- [Fantasy Statblocks](obsidian://show-plugin?id=obsidian-5e-statblocks)
+- [Fantasy Statblocks](obsidian://show-plugin?id=obsidian-5e-statblocks) (obsidian-5e-statblocks)
     - displays DnD creatures, characters, and other stat blocks clearly.
-- [DnD Wiki](obsidian://show-plugin?id=dnd-wiki)
+- [DnD Wiki](obsidian://show-plugin?id=dnd-wiki) (dnd-wiki)
     - provides references for DnD content such as spells and supports seamless homebrew creation and implementation.
-- [Callout Tracker](obsidian://show-plugin?id=callout-tracker)
+- [Callout Tracker](obsidian://show-plugin?id=callout-tracker) (callout-tracker)
     - tracks todos, ideas, hooks, and opportunities for you and AI agents to use during the campaign.
 
 ## Installation
