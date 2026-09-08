@@ -1,66 +1,96 @@
 ---
 name: obsidian-note-taking
-description: Create and edit readable Obsidian notes using standard Markdown and Obsidian-specific links, callouts, embeds, and formatting.
+description: Create, reorganize, and edit notes in Obsidian vaults while preserving properties, wikilinks, embeds, callouts, and plugin-specific Markdown. Use for note-writing tasks inside an Obsidian vault; do not use for generic Markdown outside a vault.
 ---
+
 # Obsidian Note Taking
 
-Use this skill when creating, reorganizing, or editing notes in an Obsidian vault.
+Create clear, readable Obsidian notes using standard Markdown and Obsidian-specific syntax.
 
-## Mandatory File-Editing and Reporting Rules
+## Editing and authorization
 
-- For every Markdown or other text-file addition or modification in the vault, **always use `apply_patch`** so the user can inspect the diff.
-- Use `apply_patch` with `*** Add File` when creating a new text file.
-- Treat vault text files as UTF-8. Preserve Unicode characters and existing encoding; never use shell-default encoding for vault text files.
-- If `apply_patch` is technically unsuitable, use an explicit UTF-8-safe method and verify the result before responding.
-- Do not edit files merely because the user states a fact or asks a conceptual question. Edit only when the user explicitly asks to write, add, record, update, or otherwise change a file, or when that intent is heavily implied. If the intent is unclear, ask whether the user wants it written down and propose which file or files should be changed.
-- At the end of every response that changes files, list the files that were **Added**, **Changed**, and **Deleted**, using Obsidian wikilinks.
-
-## Markdown and Links
-
-- Write content using standard Markdown for structure, including headings, paragraphs, lists, tables, blockquotes, and code blocks.
-- Link related notes with wikilinks such as `[[Note Name]]` for internal vault connections.
-- Use standard Markdown links such as `[text](https://example.com)` for external URLs.
-- When choosing between link formats, use wikilinks for notes within the vault and Markdown links for external URLs.
-
-### Internal Links
-
-- `[[Note Name]]` — link to a note
-- `[[Note Name|Display Text]]` — link to a note with custom display text
-- `[[Note Name#Heading]]` — link to a heading
-- `[[Note Name#^block-id]]` — link to a block
-- `[[#Heading in same note]]` — link to a heading in the current note
-
-## Note Structure
-
-- When the Obsidian interface already displays the file name as the note title, do not repeat it as a redundant top-level heading unless a visible title inside the note is specifically useful.
-- Use headings to organize the note's actual content.
-- Keep one main concept per note when practical.
-
-## Obsidian-Specific Formatting
-
-- Add callouts for highlighted information using `> [!type]` syntax.
-- Use callouts when they improve scanning or distinguish important information from ordinary prose.
-- `==Highlighted text==` — highlight text.
-- Preserve valid Obsidian embeds, block references, and other Obsidian syntax when editing.
-- Treat the file name as the note title; do not add a redundant top-level heading just to repeat it, since Obsidian already displays the file name as the title.
-- Preserve Dataview, ccard, statblock, Excalidraw and similar code blocks.
-- Do not replace Excalidraw data with ordinary Markdown.
-
-## Note Quality and Safety
-
-- Prefer clear headings, short paragraphs, and focused lists.
-- Link related notes when the relationship is meaningful; do not add links merely for decoration.
-- Preserve the author's terminology and content unless correction or rewriting is requested.
-- Do not invent facts when editing knowledge notes; mark uncertainty or proposals clearly.
-- Preserve existing Dataview, ccard, statblock, Excalidraw, and other specialized blocks.
-- Do not replace structured or visual data with ordinary Markdown.
-- - A Markdown file must not begin or end directly with a fenced code block or callout. Leave at least one blank line before the opening fence or and after the closing fence, even when the file contains only one code block or callout. When editing an empty file, explicitly add both the leading and trailing blank lines.
-
-## Editing Workflow
-
-- Read the relevant note and nearby context before editing.
+- Edit a vault file only when the user explicitly asks to write, record, add, reorganize, or otherwise change content.
+- Do not interpret a factual statement or conceptual question as permission to edit a file.
+- If writing intent is unclear, ask whether the user wants the information recorded and suggest the relevant note.
+- Read the target note and enough nearby context to understand its structure before editing.
 - Prefer small, targeted changes over broad rewrites.
 - Do not rename or delete notes without explicit instruction.
-- Verify new internal links point to existing or intentionally planned notes.
-- Use UTF-8-safe file handling when reading and writing notes; preserve existing Unicode characters and avoid shell-default encodings that can create mojibake.
-- Respect any workspace-specific instructions separately from this reusable skill.
+- Respect workspace-specific instructions in addition to this skill.
+
+## File operations
+
+- Use `apply_patch` for every addition or modification to Markdown and other text files in the vault.
+- Create new text files with `apply_patch` and `*** Add File`.
+- Treat vault text files as UTF-8. Preserve Unicode characters and existing encoding.
+- Never rely on shell-default encoding when writing vault text.
+- If `apply_patch` is technically unsuitable, use an explicitly UTF-8-safe method and verify the resulting file before responding.
+- Preserve unrelated content and formatting.
+
+## Reporting changes
+
+At the end of every response that changes vault files, report the affected files under these labels:
+
+- **Added**
+- **Changed**
+- **Deleted**
+
+List each file as an Obsidian wikilink. Write `None` for an empty category.
+
+## Note structure
+
+- Treat the file name as the note title.
+- Do not repeat the file name as a top-level heading unless a visible in-note title is specifically useful.
+- Use headings to organize the note’s actual content.
+- Prefer short paragraphs and focused lists.
+- Keep one main concept per note when practical.
+- Preserve the author’s terminology unless correction or rewriting was requested.
+- Do not invent facts. Clearly label uncertainty, assumptions, and proposals.
+
+## Links
+
+Use wikilinks for content inside the vault:
+
+- `[[Note Name]]`
+- `[[Note Name|Display Text]]`
+- `[[Note Name#Heading]]`
+- `[[Note Name#^block-id]]`
+- `[[#Heading in the same note]]`
+
+Use standard Markdown links for external resources:
+
+- `[Link text](https://example.com)`
+
+Add internal links only when the relationship is meaningful. Before adding one, verify that its target already exists or is intentionally planned.
+
+## Obsidian syntax
+
+- Use callouts when they materially improve scanning or distinguish important content:
+
+  `> [!note]`
+
+- Use `==highlighted text==` sparingly for meaningful emphasis.
+- Preserve valid embeds, block IDs, block references, comments, tags, and other Obsidian syntax.
+- Preserve YAML frontmatter and Obsidian properties unless the requested change requires modifying them.
+- Preserve property names, value types, and existing conventions.
+
+## Structured and plugin-specific content
+
+Preserve specialized content such as:
+
+- Dataview and DataviewJS blocks
+- Excalidraw data
+- fenced-blocks (```)
+- Mermaid diagrams
+- Tasks syntax
+- Templater expressions
+- Other plugin-specific fenced blocks or directives
+
+Do not replace structured, executable, or visual data with ordinary prose unless the user explicitly requests that conversion.
+
+## Boundary whitespace
+
+A Markdown file must not begin or end directly with a fenced code block or callout.
+
+- Leave at least one blank line before an opening fence or callout at the start of a file.
+- Leave at least one blank line after a closing fence or callout at the end of a file.
+- When creating an otherwise empty file containing only a fenced block or callout, include both the leading and trailing blank lines.

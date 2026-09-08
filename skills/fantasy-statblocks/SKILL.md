@@ -1,20 +1,156 @@
 ---
 name: fantasy-statblocks
-description: Create, edit, and troubleshoot Obsidian Fantasy Statblocks creatures stored in the vault's custom statblock data and referenced from Markdown.
+description: Create, edit, recall, and troubleshoot Fantasy Statblocks creatures in Obsidian using either inline YAML or reusable JSON storage. Use for Basic 5e statblocks, variants, overrides, and saved custom creatures; ask which storage method the user prefers before creating a new creature.
 ---
-# Fantasy Statblocks — Basic 5e Layout
 
-Use this skill when the user asks for a Fantasy Statblocks creature, variant, recalled monster, or troubleshooting help in Obsidian. Store created or edited custom creatures in `.obsidian/plugins/obsidian-5e-statblocks/data.json`, then place only a normal `statblock` reference in the relevant Markdown note. Do not use other layouts, frontmatter creatures, Dataview, JavaScript, CSS, or unrelated Obsidian formatting unless explicitly requested.
+# Fantasy Statblocks
 
-## Storage and Markdown Reference
+Create and maintain Fantasy Statblocks creatures using the Basic 5e Layout.
 
-For a new custom creature, add one entry to the `monsters` array in `.obsidian/plugins/obsidian-5e-statblocks/data.json`. Each entry is a two-item array: the creature's exact name, followed by its creature object. Use the existing JSON structure and preserve all unrelated monsters and top-level settings.
+Use the general Obsidian note-taking skill for vault discovery, UTF-8 handling, `apply_patch`, surrounding Markdown, and change reporting.
 
-Only edit creature entries inside `monsters`. Do not modify `defaultLayouts`, `layouts`, `default`, plugin settings, version data, paths, or any other top-level property. When editing an existing creature, update the matching entry rather than creating a duplicate.
+## Choose the storage method
 
-Use JSON types appropriate to the plugin data file: `stats` is an array of six numbers, `cr` is a string, numeric attack fields are numbers, and empty optional fields are empty strings when the surrounding file uses that convention. Use `bestiary: false` for campaign-created custom creatures unless an existing local convention requires otherwise.
+Before creating a new creature, ask:
 
-After adding or editing the JSON creature, add or update this reference in the relevant Markdown note:
+> Should the creature be defined inline in this note, or saved in the plugin’s JSON so it can be reused from other notes?
+
+Do not ask when:
+
+- The user already chose a method.
+- The user is editing an existing creature; preserve its current method unless conversion was requested.
+- The request is read-only troubleshooting or explanation.
+
+| Method | Advantages | Drawbacks |
+| --- | --- | --- |
+| Inline YAML | Easy for the user to find and edit; self-contained in the note; no plugin-data editing or vault reload | Not reusable elsewhere through a `monster:` reference unless separately saved |
+| Plugin JSON | Reusable from multiple notes; compact `monster:` references; one centralized creature definition | Harder to edit manually; modifying plugin data requires extra validation and usually a vault reload |
+
+The choice changes where data is stored, so do not silently select one when the user has not expressed a preference.
+
+## Inline statblocks
+
+Define an inline creature directly inside a Markdown note:
+
+````markdown
+```statblock
+layout: Basic 5e Layout
+name: HB Example Creature
+size: Medium
+type: Humanoid
+alignment: Neutral
+ac: 15
+hp: 45
+hit_dice: 6d8 + 18
+speed: 30 ft.
+stats: [16, 14, 16, 10, 12, 8]
+saves:
+  - str: 5
+skillsaves:
+  - Athletics: 5
+damage_vulnerabilities:
+damage_resistances:
+damage_immunities:
+condition_immunities:
+senses: passive Perception 11
+languages: Common
+cr: "2"
+traits:
+  - name: Example Trait
+    desc: The creature has an example trait.
+actions:
+  - name: Example Attack
+    desc: "Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 8 (1d10 + 3) slashing damage."
+    attack_bonus: 5
+    damage_dice: 1d10
+    damage_bonus: 3
+bonus_actions: []
+reactions: []
+legendary_actions: []
+spells: []
+```
+````
+
+All fields are optional. Include only fields that apply to the creature; remove unused fields instead of filling them with meaningless placeholders.
+
+### Inline field types
+
+- `layout`: Use `Basic 5e Layout` unless another layout was explicitly requested.
+- `image`: Use an Obsidian image wikilink when provided.
+- `ac` and `hp`: Numbers.
+- `stats`: Six numbers in STR, DEX, CON, INT, WIS, CHA order.
+- `fage_stats`: Nine Fantasy AGE values. Omit this field for an ordinary 5e creature.
+- `cr`: Quote fractional values such as `"1/2"`.
+- `saves`: List of ability-to-modifier mappings.
+- `skillsaves`: List of skill-to-modifier mappings.
+- `spells`: List of spellcasting information supported by the plugin.
+- `traits`, `actions`, `bonus_actions`, `reactions`, and `legendary_actions`: Lists of named entries with descriptions.
+
+Trait and action entries use:
+
+```yaml
+- name: Entry Name
+  desc: Entry description.
+```
+
+For attacks, optional structured fields include:
+
+```yaml
+attack_bonus: 5
+damage_dice: 1d10
+damage_bonus: 3
+```
+
+Keep the complete playable attack text in `desc`. Quote YAML values containing syntax-sensitive characters such as `:` or `*`.
+
+Inline statblocks do not require a JSON edit or vault reload.
+
+## Reusable JSON creatures
+
+Reusable custom creatures are stored in:
+
+```text
+.obsidian/plugins/obsidian-5e-statblocks/data.json
+```
+
+Read the complete existing file before editing it. Plugin versions and local conventions may differ.
+
+Add or update only the intended entry in the top-level `monsters` array. Each custom entry is a two-item array:
+
+```json
+[
+  "HB Creature Name",
+  {
+    "name": "HB Creature Name",
+    "bestiary": false
+  }
+]
+```
+
+- The first item is the exact lookup name.
+- The second item is the creature object.
+- Update a matching entry instead of creating a duplicate.
+- Preserve all unrelated monsters and top-level data.
+- Do not modify layouts, defaults, plugin settings, version information, paths, or other top-level properties.
+- Follow the types and field conventions already used by nearby custom monsters.
+- Use `stats` as six numbers in standard ability-score order.
+- Preserve the local JSON representation of `cr`; custom data commonly stores it as a string.
+- Use numeric types for structured attack fields.
+- Use `bestiary: false` for campaign-created creatures unless the existing vault uses another convention.
+
+Reference a saved creature from Markdown with:
+
+````markdown
+```statblock
+monster: "HB Creature Name"
+```
+````
+
+The JSON entry key, object `name`, and Markdown `monster:` value must match exactly.
+
+## Existing creatures and variants
+
+Recall an existing creature with:
 
 ````markdown
 ```statblock
@@ -22,82 +158,65 @@ monster: "Creature Name"
 ```
 ````
 
-The `monster` value must exactly match the creature name/key in `data.json`. Do not duplicate the full creature YAML inline in the note.
+A `monster:` reference may be combined with inline fields to override selected values:
 
-## Custom Creature JSON Structure
+````markdown
+```statblock
+monster: "Ancient Black Dragon"
+name: Paarthurnax
+hp: 420
+```
+````
 
-Use only fields supported by the Basic 5e Layout and the existing custom data format. Omit unused optional fields when the file's existing convention permits it.
+Use `extends` when the creature should retain a live relationship to a base creature.
 
-- Identity: `image`, `name`, `size`, `type`, `subtype`, `alignment`
-- Combat: `ac`, `hp`, `hit_dice`, `speed`
-- Abilities: `stats` in STR, DEX, CON, INT, WIS, CHA order
-- Proficiencies: `saves` and `skillsaves` lists of ability/skill-to-modifier mappings
-- Information: `senses`, `languages`, `cr`
-- Defenses: `damage_vulnerabilities`, `damage_resistances`, `damage_immunities`, `condition_immunities`
-- Sections: `traits`, `actions`, `bonus_actions`, `reactions`, `legendary_actions`, `spells`
+Use list operators such as `traits+`, `actions+`, `traits-`, or `actions-` only when deliberately adding to or removing from an inherited list.
 
-Traits, actions, bonus actions, reactions, and legendary actions use this structure:
+Do not replace a reusable JSON creature with duplicated inline definitions unless the user requests conversion.
 
-```json
-"traits": [
-  {
-    "name": "Trait Name",
-    "desc": "Trait description.",
-    "attack_bonus": 0
-  }
-],
-"actions": [
-  {
-    "name": "Action Name",
-    "desc": "Action description.",
-    "attack_bonus": 0
-  }
-]
+## Creature-writing conventions
+
+- Prefix newly designed campaign creatures with `HB`, unless the user specifies another name.
+- Keep the JSON key, object `name`, and Markdown reference consistent.
+- Write compact, playable statblocks.
+- Include mechanics needed to run the creature, but omit redundant rules text.
+- Do not reproduce full spell descriptions inside the statblock.
+- When requested and the `dnd-wiki-obsidian` skill is available, add separate DnD Wiki spell references after the statblock.
+- Avoid resistance to bludgeoning, piercing, and slashing simultaneously unless the user explicitly wants it or the creature’s design strongly requires it.
+- Preserve meaningful player counterplay.
+- When designing a creature, infer reasonable statistics from the requested concept and briefly disclose important assumptions outside the block.
+- When editing an existing creature, do not invent unrelated mechanics.
+
+## Validation
+
+For both storage methods:
+
+1. Confirm the requested storage method.
+2. Confirm that the statblock uses supported Basic 5e fields.
+3. Confirm that `stats` contains six numbers in the correct order.
+4. Confirm YAML indentation and quote syntax-sensitive values.
+5. Confirm every trait and action has a `name` and `desc`.
+6. Confirm structured attack bonuses and damage bonuses are numeric.
+7. Preserve unrelated note content and existing statblocks.
+
+For JSON storage additionally:
+
+1. Parse the completed file as JSON.
+2. Confirm that only the intended `monsters` entry changed.
+3. Confirm that no duplicate creature key was introduced.
+4. Confirm that the JSON key, object `name`, and Markdown reference match.
+5. Confirm that unrelated top-level settings remain unchanged.
+
+## Reload after JSON changes
+
+A vault reload is needed only after manually changing the plugin JSON.
+
+After all JSON and Markdown edits are complete and verified, run:
+
+```text
+obsidian vault="Vault Name" reload
 ```
 
-For attacks, use numeric `attack_bonus`, and add `damage_dice` and `damage_bonus` only when applicable. Keep the complete attack text in `desc`; do not invent unsupported JSON fields. Spell entries are strings in a list.
+Replace `Vault Name` with the actual vault name.
 
-## Personal Preferences
-
-- Always prefix custom-created monster names with `HB` (for example, `HB Half-Blood Vampire`). Keep the same prefixed name in the JSON key, creature object's `name`, and Markdown `monster` reference.
-- Write statblocks compactly. Include mechanics players or the DM need to run the creature, but leave out unnecessary detail and rules text that is already obvious or implied. For example, do not add phrases such as "requiring no material components" unless that fact matters for play.
-- When mentioning spells, do not write spell descriptions in the statblock. Use the spell name and only the necessary casting or gameplay details. When the `dnd-wiki-obsidian` skill is available, add the mentioned spells after the statblock as DnD Wiki spell blocks, preferring 2024 spell entries where an equivalent exists.
-- Avoid giving a creature resistance to bludgeoning, piercing, and slashing damage all at once. That combination can make melee characters less effective and less able to play around the creature's defenses. If damage resistances are appropriate, normally choose a narrower resistance or another defense so players retain meaningful counterplay.
-
-## Existing creatures
-
-- Use the Markdown `monster: Creature Name` reference when recalling a bestiary or custom creature.
-- Combine `monster` with explicit fields to override values.
-- Use `extends` for a variant based on one or more creatures.
-- Use `actions+`, `actions-`, or equivalent list operators only when adding to or removing from inherited lists.
-- When editing an existing custom creature, make the smallest targeted change to its JSON entry and keep the Markdown note as a reference.
-
-## JSON and Reference Validation
-
-Before returning a block, verify:
-
-1. The JSON remains valid.
-2. Only the intended entry or entries in `monsters` changed; unrelated monsters and top-level settings remain unchanged.
-3. The creature's key, object `name`, and Markdown `monster` reference match exactly.
-4. `stats` contains six values in standard ability-score order.
-5. `cr` uses the plugin's expected string format.
-6. Every trait/action entry has `name`, `desc`, and the expected numeric attack fields where applicable.
-7. The Markdown reference uses exactly the `statblock` fence and includes `monster`.
-
-## Missing information
-
-Do not invent important statistics unless the user asks you to design the creature. Ask for missing information when needed; if designing it, state the assumptions briefly outside the code block.
-
-Troubleshoot the JSON entry and reference first: valid JSON, `monsters` entry shape, matching names, supported fields, numeric types, and the Markdown reference fence.
-
-## Final Reload Step
-
-- After all statblock JSON and Markdown edits are complete and verified, run this as the **very last tool action**:
-
-  ```text
-  obsidian vault="Vault Name" reload
-  ```
-
-- Replace `Vault Name` with the actual vault name. Do not run this command before all edits and checks are finished; reloading the vault can interrupt or cancel the agent before it reports completion.
-- This final step is required because the custom `data.json` file was edited manually and the running plugin may still be using its old in-memory data. Reload the **vault**, not just the plugin.
-- If the user reports that the command did not work, tell them to enable **Settings → General → Command line interface** in Obsidian, then retry the final command.
+Do not reload after an inline-only edit. If the command-line interface is unavailable, tell the user to enable **Settings → General → Command line interface** or reload the vault manually.
