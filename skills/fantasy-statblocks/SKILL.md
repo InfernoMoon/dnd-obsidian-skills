@@ -35,7 +35,7 @@ Define an inline creature directly inside a Markdown note:
 ````markdown
 ```statblock
 layout: Basic 5e Layout
-name: HB Example Creature
+name: Example Creature
 size: Medium
 type: Humanoid
 alignment: Neutral
@@ -129,6 +129,7 @@ Add or update only the intended entry in the top-level `monsters` array. Each cu
 
 - The first item is the exact lookup name.
 - The second item is the creature object.
+- Always include the "HB" prefix for newly designed campaign creatures.
 - Update a matching entry instead of creating a duplicate.
 - Preserve all unrelated monsters and top-level data.
 - Do not modify layouts, defaults, plugin settings, version information, paths, or other top-level properties.
