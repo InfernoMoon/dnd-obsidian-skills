@@ -21,9 +21,10 @@ When doing creative work, always review relevant information in the vault first.
 Before editing a Campaign file, read the full `SKILL.md` for every applicable skill listed below. These skills are mandatory, not recommendations.
 
 - **MUST read and follow `obsidian-note-taking` before creating or editing any Campaign note or text file.** It governs Markdown structure, wikilinks, external links, callouts, highlights, embeds, and specialized note blocks.
-- Use `callout-tracking` when creating, reviewing, or updating `[!idea]`, `[!note]`, or `[!todo]` callouts tracked by the campaign's TODO manager. Also use this get get current ToDos ot available Hooks.
+- Use `callout-tracking` when creating, reviewing, or updating `[!idea]`, `[!note]`, or `[!todo]` callouts tracked by the campaign's TODO manager.
 - Use `dnd-wiki-obsidian` when creating or editing DnD Wiki plugin blocks, content types, source versions, parameters, or plugin-specific syntax.
 - Use `fantasy-statblocks` when creating, editing, or troubleshooting Fantasy Statblocks creatures using the Basic 5e Layout.
+- Always use the `image-generation` skill before generating images. Follow its metadata workflow and create the required `.image.md` sidecar file next to every generated image.
 - Use more than one skill when a task combines these areas; for example, use both `obsidian-note-taking` and `dnd-wiki-obsidian` when placing a DnD Wiki block into a note.
 
 ## Source of Truth
