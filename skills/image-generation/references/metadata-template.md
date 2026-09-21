@@ -25,7 +25,8 @@ generation:
 
 ## Original Request
 
-<!-- Preserve the user’s original request exactly as written. -->
+<!-- Preserve the user’s original request as written. Also include any additional context or clarifications provided by the user. If the idea came together during multiple interactions, summarize that process here. -->
+<!-- Generally summarize the user’s intent and any important context that influenced the request, without including made up details by the ai assistant. -->
 
 ## Final Prompt
 
