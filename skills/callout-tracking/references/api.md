@@ -29,7 +29,8 @@ Supported options:
 | --- | --- |
 | `callouts` | Array or comma-separated string of types; defaults to `idea`, `note`, and `todo` |
 | `rootFolder` | Optional vault-relative folder; defaults to the plugin's configured root |
-| `search` | Optional case-insensitive text matched against filename, title, and body |
+| `search` | Optional case-insensitive text matched against filename, title, properties, and body |
+| `filter` | Optional property and arithmetic filter, such as `{status} = "planned"` or `{cost} / 2 > 20` |
 
 Each result contains:
 
@@ -39,8 +40,34 @@ Each result contains:
 - `type`
 - `title`
 - `body`
+- `properties` — an array of `{key, value}` objects
 
 An empty array is a successful query with no matches. An `undefined` result usually indicates that the plugin is not enabled or loaded. Preserve and report actual CLI or bridge errors rather than replacing them with guesses.
+
+Markdown results include a 1-based `line`. Canvas results do not include a line because Canvas callouts are stored inside text nodes; open the `.canvas` file instead.
+
+## Summary method
+
+Use `api.summarize(options)` when a calculated value and the matching callouts are needed together:
+
+```javascript
+api.summarize({
+  callouts: ['cost'],
+  filter: '{status} = "planned"',
+  summary: '"Total: " + sum({cost}) + "€"',
+})
+```
+
+The summary method accepts the same `callouts`, `rootFolder`, `search`, and `filter` options as `api.search()`, plus a required `summary` expression. Supported functions are `count()`, `sum(expression)`, `avg(expression)`, `max(expression)`, and `min(expression)`. It returns:
+
+```javascript
+{
+  value: 'Total: 180€',
+  callouts: [...],
+}
+```
+
+Numeric functions ignore missing or non-numeric property values. `count()` counts all callouts remaining after search and filtering. Summary expressions are parsed explicitly and are not executed as JavaScript.
 
 ## Obsidian CLI bridge
 
@@ -74,6 +101,12 @@ obsidian vault="Vault Name" eval "code=Object.values(app.plugins.plugins).find(p
 ```
 
 The block setting is named `rootfolder:`, while the API option is `rootFolder`. Do not interchange their capitalization.
+
+To calculate a summary through the Obsidian CLI:
+
+```text
+obsidian vault="Vault Name" eval 'code=Object.values(app.plugins.plugins).find(p=>p?.api?.summarize)?.api.summarize({callouts:["cost"],filter:"{cost} > 40",summary:"Total: " + sum({cost}) + "€"}).then(result=>JSON.stringify(result))'
+```
 
 ## Read-only fallback
 
